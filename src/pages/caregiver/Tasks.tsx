@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Navigation from '../../components/common/Navigation';
-import { CheckSquare, Plus, Calendar, User, Clock, AlertCircle, X } from 'lucide-react';
+import { CheckSquare, Plus, Calendar, User, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { isCaregiverUser } from '../../types/user';
 import type { PatientUser } from '../../types/user';
-import type { Task, CreateTaskData, TaskCategory, TaskPriority } from '../../types/task';
+import type { Task, TaskCategory, TaskPriority } from '../../types/task';
 import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import './CaregiverTasks.css';
@@ -142,10 +142,6 @@ const Tasks: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
-
-    const getPatientName = (id: string) => {
-        return patients.find(p => p.id === id)?.name || 'Unknown Patient';
     };
 
     const getPriorityColor = (priority: TaskPriority) => {

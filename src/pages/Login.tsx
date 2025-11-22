@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Brain, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
 import type { UserRole } from '../types';
@@ -12,7 +12,7 @@ const Login: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [showRoleModal, setShowRoleModal] = useState(false);
     const { login, signInWithGoogle } = useAuth();
-    const navigate = useNavigate();
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

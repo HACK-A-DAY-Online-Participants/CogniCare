@@ -58,10 +58,11 @@ const Tasks: React.FC = () => {
         }
     };
 
+
     const toggleTask = async (taskId: string) => {
         try {
             const task = tasks.find(t => t.id === taskId);
-            if (!task) return;
+            if (!task || !currentUser) return;
 
             const taskRef = doc(db, 'tasks', taskId);
             const newCompletedStatus = !task.completed;
@@ -71,6 +72,17 @@ const Tasks: React.FC = () => {
                 completedAt: newCompletedStatus ? serverTimestamp() : null,
                 updatedAt: serverTimestamp()
             });
+
+            // Log activity for AI analysis
+            if (newCompletedStatus && isPatientUser(currentUser)) {
+                const { aiService } = await import('../../services/aiService');
+                await aiService.logActivity(currentUser.id, 'task_completed', {
+                    taskId: task.id,
+                    points: task.points,
+                    category: task.category,
+                    onTime: new Date() <= task.dueDate
+                });
+            }
 
             // Update local state
             setTasks(tasks.map(t =>

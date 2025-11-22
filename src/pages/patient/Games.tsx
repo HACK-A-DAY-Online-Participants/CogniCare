@@ -134,7 +134,7 @@ const Games: React.FC = () => {
 
         alert(`Simulating game play for "${game.name}"...\n\nGreat job! You scored ${score} points!`);
 
-        dataService.saveGameResult('p1', game.id, score, game.name);
+        dataService.saveGameResult('p1', score, game.name);
         loadGameData(); // Refresh state
     };
 

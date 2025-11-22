@@ -24,6 +24,7 @@ export interface PatientUser extends BaseUser {
   age: number;
   mood: string;
   lastVisit?: Date;
+  status?: 'active' | 'inactive' | 'needs-attention';
 }
 
 export interface CaregiverUser extends BaseUser {

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Navigation from '../../components/common/Navigation';
-import { Brain, Trophy, Calendar, Activity, Play, CheckCircle, UserPlus, X, Check } from 'lucide-react';
+import { Brain, Trophy, Play, CheckCircle, UserPlus, X, Check } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { isPatientUser } from '../../types/user';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import type { CaregiverRequest } from '../../types/notifications';
+import type { Task } from '../../types/task';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -15,40 +16,103 @@ const Dashboard: React.FC = () => {
         totalPoints: 0,
         level: 1,
         streak: 0,
-        completionRate: 0
+        completionRate: 0,
+        tasksCompleted: 0,
+        totalTasks: 0
     });
 
-    const [upcomingTasks, setUpcomingTasks] = useState<any[]>([]);
+    const [upcomingTasks, setUpcomingTasks] = useState<Task[]>([]);
     const [pendingRequests, setPendingRequests] = useState<CaregiverRequest[]>([]);
+    const [caregiverName, setCaregiverName] = useState<string>('');
 
     useEffect(() => {
         loadDashboardData();
+        logLoginActivity();
     }, [currentUser]);
+
+    const logLoginActivity = async () => {
+        if (!currentUser || !isPatientUser(currentUser)) return;
+
+        try {
+            const { aiService } = await import('../../services/aiService');
+            await aiService.logActivity(currentUser.id, 'login', {
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Error logging login activity:', error);
+        }
+    };
 
     const loadDashboardData = async () => {
         if (!currentUser || !isPatientUser(currentUser)) return;
 
-        // Load patient stats (you can implement this later with real data)
-        setStats({
-            points: currentUser.points || 0,
-            totalPoints: currentUser.points || 0,
-            level: currentUser.level || 1,
-            streak: 3, // Mock value
-            completionRate: 0 // Calculate from tasks later
-        });
-
-        // Load pending caregiver requests from Firestore
         try {
+            // Load tasks from Firebase
+            const tasksQuery = query(
+                collection(db, 'tasks'),
+                where('patientId', '==', currentUser.id)
+            );
+
+            const tasksSnapshot = await getDocs(tasksQuery);
+            const tasksData: Task[] = [];
+
+            tasksSnapshot.forEach((doc) => {
+                const data = doc.data();
+                tasksData.push({
+                    id: doc.id,
+                    ...data,
+                    dueDate: data.dueDate?.toDate() || new Date(),
+                    completedAt: data.completedAt?.toDate(),
+                    createdAt: data.createdAt?.toDate() || new Date(),
+                    updatedAt: data.updatedAt?.toDate() || new Date()
+                } as Task);
+            });
+
+            // Calculate stats from tasks
+            const completedTasks = tasksData.filter(t => t.completed);
+            const totalPoints = completedTasks.reduce((sum, t) => sum + t.points, 0);
+            const level = Math.floor(totalPoints / 500) + 1;
+            const completionRate = tasksData.length > 0
+                ? Math.round((completedTasks.length / tasksData.length) * 100)
+                : 0;
+
+            setStats({
+                points: totalPoints,
+                totalPoints: totalPoints,
+                level: level,
+                streak: 3, // TODO: Calculate actual streak from completion dates
+                completionRate: completionRate,
+                tasksCompleted: completedTasks.length,
+                totalTasks: tasksData.length
+            });
+
+            // Get upcoming tasks (not completed, sorted by due date)
+            const upcoming = tasksData
+                .filter(t => !t.completed)
+                .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime())
+                .slice(0, 3);
+
+            setUpcomingTasks(upcoming);
+
+            // Load caregiver name if connected
+            if (currentUser.caregiverId) {
+                const caregiverDoc = await getDoc(doc(db, 'users', currentUser.caregiverId));
+                if (caregiverDoc.exists()) {
+                    setCaregiverName(caregiverDoc.data().name);
+                }
+            }
+
+            // Load pending caregiver requests
             const requestsQuery = query(
                 collection(db, 'caregiverRequests'),
                 where('patientId', '==', currentUser.id),
                 where('status', '==', 'pending')
             );
 
-            const querySnapshot = await getDocs(requestsQuery);
+            const requestsSnapshot = await getDocs(requestsQuery);
             const requests: CaregiverRequest[] = [];
 
-            querySnapshot.forEach((doc) => {
+            requestsSnapshot.forEach((doc) => {
                 requests.push({
                     id: doc.id,
                     ...doc.data(),
@@ -58,21 +122,30 @@ const Dashboard: React.FC = () => {
             });
 
             setPendingRequests(requests);
-        } catch (error) {
-            console.error('Error loading caregiver requests:', error);
-        }
 
-        // TODO: Load tasks from Firestore
-        setUpcomingTasks([]);
+        } catch (error) {
+            console.error('Error loading dashboard data:', error);
+        }
     };
 
     const handleRequest = async (requestId: string, accept: boolean) => {
         try {
             await respondToCaregiverRequest(requestId, accept);
-            // Refresh dashboard to remove the request
+            // Refresh dashboard to remove the request and update caregiver info
             await loadDashboardData();
         } catch (error) {
             console.error('Error responding to request:', error);
+        }
+    };
+
+    const getCategoryIcon = (category: string) => {
+        switch (category) {
+            case 'medication': return '💊';
+            case 'exercise': return '🏃';
+            case 'mental': return '🧠';
+            case 'social': return '👥';
+            case 'diet': return '🥗';
+            default: return '📋';
         }
     };
 
@@ -83,7 +156,7 @@ const Dashboard: React.FC = () => {
             <div className="page-container">
                 <header className="dashboard-header">
                     <div>
-                        <h1 className="page-title">Hello, John!</h1>
+                        <h1 className="page-title">Hello, {currentUser?.name || 'Patient'}!</h1>
                         <p className="page-subtitle">Ready to exercise your brain today?</p>
                     </div>
                     <div className="daily-streak">
@@ -123,7 +196,7 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div className="stat-content">
                             <span className="stat-label">Cognitive Score</span>
-                            <span className="stat-value large">85</span>
+                            <span className="stat-value large">{currentUser && isPatientUser(currentUser) ? currentUser.cognitiveScore : 85}</span>
                             <span className="stat-sub">Excellent! Top 10%</span>
                         </div>
                     </div>
@@ -145,8 +218,8 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div className="stat-content">
                             <span className="stat-label">Tasks Done</span>
-                            <span className="stat-value">{stats.completionRate}%</span>
-                            <span className="stat-sub">Keep it up!</span>
+                            <span className="stat-value">{stats.tasksCompleted}/{stats.totalTasks}</span>
+                            <span className="stat-sub">{stats.completionRate}% Complete</span>
                         </div>
                     </div>
                 </div>
@@ -156,19 +229,21 @@ const Dashboard: React.FC = () => {
                     <div className="content-section card">
                         <div className="section-header">
                             <h2>Today's Plan</h2>
-                            <button className="btn-link">View Calendar</button>
+                            {caregiverName && (
+                                <span className="text-sm text-gray-600">Assigned by {caregiverName}</span>
+                            )}
                         </div>
                         <div className="tasks-list">
                             {upcomingTasks.length > 0 ? (
                                 upcomingTasks.map((task) => (
                                     <div key={task.id} className="task-item">
                                         <div className={`task-icon ${task.category}`}>
-                                            {task.category === 'medication' ? <Activity size={20} /> : <Calendar size={20} />}
+                                            <span style={{ fontSize: '20px' }}>{getCategoryIcon(task.category)}</span>
                                         </div>
                                         <div className="task-info">
                                             <h4>{task.title}</h4>
                                             <span className="task-time">
-                                                {new Date(task.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                {task.dueDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {task.points} pts
                                             </span>
                                         </div>
                                         <button className="btn-action">Start</button>

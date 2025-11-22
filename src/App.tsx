@@ -15,6 +15,8 @@ import PatientSocial from './pages/patient/Social';
 import PatientMemoryBoard from './pages/patient/MemoryBoard';
 import PatientRewards from './pages/patient/Rewards';
 import DailyChallenge from './pages/patient/DailyChallenge';
+import PatientAIInsights from './pages/patient/AIInsights';
+
 
 // Caregiver Pages
 import CaregiverDashboard from './pages/caregiver/Dashboard';
@@ -23,12 +25,14 @@ import CaregiverTasks from './pages/caregiver/Tasks';
 import CaregiverAnalytics from './pages/caregiver/Analytics';
 import CaregiverSocial from './pages/caregiver/Social';
 import CaregiverConsultation from './pages/caregiver/Consultation';
+import CaregiverAIMonitoring from './pages/caregiver/AIMonitoring';
 
 // Expert Pages
 import ExpertDashboard from './pages/expert/Dashboard';
 import ExpertPatients from './pages/expert/Patients';
 import ExpertConsultations from './pages/expert/Consultations';
 import ExpertAnalytics from './pages/expert/Analytics';
+import ExpertProfile from './pages/expert/Profile';
 
 import './index.css';
 
@@ -92,6 +96,7 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/patient/memory-board"
         element={
@@ -113,6 +118,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute allowedRoles={['patient']}>
             <DailyChallenge />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/patient/ai-insights"
+        element={
+          <ProtectedRoute allowedRoles={['patient']}>
+            <PatientAIInsights />
           </ProtectedRoute>
         }
       />
@@ -166,6 +179,14 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/caregiver/ai-monitoring"
+        element={
+          <ProtectedRoute allowedRoles={['caregiver']}>
+            <CaregiverAIMonitoring />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Expert Routes */}
       <Route
@@ -197,6 +218,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute allowedRoles={['expert']}>
             <ExpertAnalytics />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/expert/profile"
+        element={
+          <ProtectedRoute allowedRoles={['expert']}>
+            <ExpertProfile />
           </ProtectedRoute>
         }
       />

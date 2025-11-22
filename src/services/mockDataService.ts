@@ -340,7 +340,7 @@ export class DataService {
     }));
   }
 
-  saveGameResult(patientId: string, gameId: string, score: number, gameName: string) {
+  saveGameResult(patientId: string, score: number, gameName: string) {
     // Mock saving game result - would save to database in real app
     console.log(`Game result saved: Patient ${patientId} scored ${score} in ${gameName}`);
     // In a real app, this would save to a gameResults collection

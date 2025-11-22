@@ -14,7 +14,9 @@ import {
     MessageSquare,
     LogOut,
     Menu,
-    X
+    X,
+    Sparkles,
+    Mic
 } from 'lucide-react';
 import './Navigation.css';
 
@@ -40,6 +42,8 @@ const Navigation: React.FC<NavigationProps> = ({ userRole }) => {
     const patientLinks = [
         { path: '/patient', label: 'Dashboard', icon: Home },
         { path: '/patient/tasks', label: 'Tasks', icon: CheckSquare },
+        { path: '/patient/ai-insights', label: 'AI Insights', icon: Sparkles },
+        { path: '/patient/voice-assistant', label: 'Voice Assistant', icon: Mic },
         { path: '/patient/games', label: 'Games', icon: Gamepad2 },
         { path: '/patient/daily-challenge', label: 'Daily Challenge', icon: Calendar },
         { path: '/patient/memory-board', label: 'Memory Board', icon: Image },
@@ -51,6 +55,7 @@ const Navigation: React.FC<NavigationProps> = ({ userRole }) => {
         { path: '/caregiver', label: 'Dashboard', icon: Home },
         { path: '/caregiver/patients', label: 'My Patients', icon: Users },
         { path: '/caregiver/tasks', label: 'Tasks', icon: CheckSquare },
+        { path: '/caregiver/ai-monitoring', label: 'AI Monitoring', icon: Sparkles },
         { path: '/caregiver/analytics', label: 'Analytics', icon: BarChart3 },
         { path: '/caregiver/consultation', label: 'Consultations', icon: MessageSquare },
         { path: '/caregiver/social', label: 'Community', icon: Users }
