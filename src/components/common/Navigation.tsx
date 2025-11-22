@@ -44,7 +44,8 @@ const Navigation: React.FC<NavigationProps> = ({ userRole }) => {
         { path: '/patient/daily-challenge', label: 'Daily Challenge', icon: Calendar },
         { path: '/patient/memory-board', label: 'Memory Board', icon: Image },
         { path: '/patient/rewards', label: 'Rewards', icon: Award },
-        { path: '/patient/social', label: 'Social', icon: Users }
+        { path: '/patient/social', label: 'Social', icon: Users },
+        { path: '/patient/voice-assistant', label: 'Voice Assistant', icon: MessageSquare }
     ];
 
     const caregiverLinks = [

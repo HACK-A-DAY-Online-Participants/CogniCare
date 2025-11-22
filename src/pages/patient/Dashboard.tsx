@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navigation from '../../components/common/Navigation';
+import Chatbot from '../../components/common/Chatbot';
+import VoiceAgent from '../../components/common/VoiceAgent';
 import { Brain, Trophy, Calendar, Activity, Play, CheckCircle, UserPlus, X, Check } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { isPatientUser } from '../../types/user';
@@ -90,6 +92,7 @@ const Dashboard: React.FC = () => {
                         <span className="streak-count">{stats.streak}</span>
                         <span className="streak-label">Day Streak! 🔥</span>
                     </div>
+                    <VoiceAgent showStatus={false} />
                 </header>
 
                 {/* Connection Request Alert */}
@@ -230,6 +233,7 @@ const Dashboard: React.FC = () => {
                     </div>
                 </div>
             </div>
+            <Chatbot />
         </div>
     );
 };

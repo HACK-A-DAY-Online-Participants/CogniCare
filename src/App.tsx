@@ -15,6 +15,7 @@ import PatientSocial from './pages/patient/Social';
 import PatientMemoryBoard from './pages/patient/MemoryBoard';
 import PatientRewards from './pages/patient/Rewards';
 import DailyChallenge from './pages/patient/DailyChallenge';
+import VoiceAssistant from './pages/patient/VoiceAssistant';
 
 // Caregiver Pages
 import CaregiverDashboard from './pages/caregiver/Dashboard';
@@ -113,6 +114,15 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute allowedRoles={['patient']}>
             <DailyChallenge />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/patient/voice-assistant"
+        element={
+          <ProtectedRoute allowedRoles={['patient']}>
+            <VoiceAssistant />
           </ProtectedRoute>
         }
       />
