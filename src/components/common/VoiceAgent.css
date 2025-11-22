@@ -1,0 +1,147 @@
+.voice-agent-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    border-radius: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.voice-agent-container:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+.voice-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.voice-btn.idle {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.voice-btn.idle:hover {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.voice-btn.listening {
+    background: #ef4444;
+    color: white;
+    animation: pulse-red 2s infinite;
+}
+
+.voice-btn.speaking {
+    background: #6366f1;
+    color: white;
+    animation: pulse-blue 2s infinite;
+}
+
+.voice-status {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #475569;
+    min-width: 100px;
+}
+
+.voice-status.listening {
+    color: #ef4444;
+}
+
+.voice-status.speaking {
+    color: #6366f1;
+}
+
+@keyframes pulse-red {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+@keyframes pulse-blue {
+    0% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    }
+}
+
+.wave-container {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 20px;
+}
+
+.wave-bar {
+    width: 3px;
+    background: currentColor;
+    border-radius: 2px;
+    animation: wave 1s ease-in-out infinite;
+}
+
+.wave-bar:nth-child(1) {
+    animation-delay: 0.0s;
+    height: 40%;
+}
+
+.wave-bar:nth-child(2) {
+    animation-delay: 0.1s;
+    height: 60%;
+}
+
+.wave-bar:nth-child(3) {
+    animation-delay: 0.2s;
+    height: 100%;
+}
+
+.wave-bar:nth-child(4) {
+    animation-delay: 0.3s;
+    height: 60%;
+}
+
+.wave-bar:nth-child(5) {
+    animation-delay: 0.4s;
+    height: 40%;
+}
+
+@keyframes wave {
+
+    0%,
+    100% {
+        transform: scaleY(1);
+    }
+
+    50% {
+        transform: scaleY(1.5);
+    }
+}

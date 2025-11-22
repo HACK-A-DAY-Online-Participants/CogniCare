@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Navigation from '../../components/common/Navigation';
 import { Brain, Zap, Target, MessageSquare, Eye, Play, Award, TrendingUp } from 'lucide-react';
 import { dataService } from '../../services/mockDataService';
+import MemoryGame from './MemoryGame';
+import FamilyMemory from './FamilyMemory';
+import LogicPuzzle from './LogicPuzzle';
+import PatternRecognition from './PatternRecognition';
+import AttentionTraining from './AttentionTraining';
+import SpeedMemory from './SpeedMemory';
 import './Games.css';
 
 interface GameItem {
@@ -23,8 +29,13 @@ const Games: React.FC = () => {
     const [games, setGames] = useState<GameItem[]>([]);
     const [totalPoints, setTotalPoints] = useState(0);
     const [gamesPlayedCount, setGamesPlayedCount] = useState(0);
+    const [showMemoryGame, setShowMemoryGame] = useState(false);
+    const [showFamilyMemory, setShowFamilyMemory] = useState(false);
+    const [showLogicPuzzle, setShowLogicPuzzle] = useState(false);
+    const [showPatternRecognition, setShowPatternRecognition] = useState(false);
+    const [showAttentionTraining, setShowAttentionTraining] = useState(false);
+    const [showSpeedMemory, setShowSpeedMemory] = useState(false);
 
-    // Initial Game Definitions
     const GAME_DEFINITIONS: GameItem[] = [
         {
             id: '1',
@@ -40,12 +51,12 @@ const Games: React.FC = () => {
         },
         {
             id: '2',
-            name: 'Word Puzzle',
-            description: 'Find hidden words to enhance language skills',
-            category: 'language',
+            name: 'Family Memory',
+            description: 'Recognize and remember family members by their photos',
+            category: 'memory',
             difficulty: 'medium',
-            points: 150,
-            estimatedTime: 15,
+            points: 180,
+            estimatedTime: 12,
             icon: <MessageSquare size={32} />,
             color: '#3b82f6',
             played: false
@@ -65,7 +76,7 @@ const Games: React.FC = () => {
         {
             id: '4',
             name: 'Attention Training',
-            description: 'Focus exercises to improve concentration',
+            description: 'Practice your attention by finding the odd symbol out',
             category: 'attention',
             difficulty: 'easy',
             points: 100,
@@ -105,17 +116,13 @@ const Games: React.FC = () => {
     }, []);
 
     const loadGameData = () => {
-        // Get activities to determine what has been played
         const activities = dataService.getPatientActivities('p1');
         const gameActivities = activities.filter(a => a.type === 'game');
-
-        // Update game states based on history
         const updatedGames = GAME_DEFINITIONS.map(game => {
             const gamePlays = gameActivities.filter(a => a.title.includes(game.name));
             const bestScore = gamePlays.length > 0
                 ? Math.max(...gamePlays.map(p => p.score || 0))
                 : undefined;
-
             return {
                 ...game,
                 played: gamePlays.length > 0,
@@ -129,13 +136,113 @@ const Games: React.FC = () => {
     };
 
     const handlePlayGame = (game: GameItem) => {
-        // Simulate playing a game and getting a score
-        const score = Math.floor(Math.random() * 50) + game.points; // Random score for demo
+        if (game.name === 'Memory Match') {
+            setShowMemoryGame(true);
+            return;
+        }
+        if (game.name === 'Family Memory') {
+            setShowFamilyMemory(true);
+            return;
+        }
+        if (game.name === 'Pattern Recognition') {
+            setShowPatternRecognition(true);
+            return;
+        }
+        if (game.name === 'Attention Training') {
+            setShowAttentionTraining(true);
+            return;
+        }
+        if (game.name === 'Speed Memory') {
+            setShowSpeedMemory(true);
+            return;
+        }
+        if (game.name === 'Logic Puzzles') {
+            setShowLogicPuzzle(true);
+            return;
+        }
 
+        const score = Math.floor(Math.random() * 50) + game.points;
         alert(`Simulating game play for "${game.name}"...\n\nGreat job! You scored ${score} points!`);
-
         dataService.saveGameResult('p1', score, game.name);
-        loadGameData(); // Refresh state
+        loadGameData();
+    };
+
+    const handleMemoryGameComplete = (score: number) => {
+        const game = GAME_DEFINITIONS.find(g => g.name === 'Memory Match');
+        if (game) {
+            dataService.saveGameResult('p1', score, game.name);
+            loadGameData();
+            setShowMemoryGame(false);
+        }
+    };
+
+    const handleCloseMemoryGame = () => {
+        setShowMemoryGame(false);
+    };
+
+    const handleFamilyMemoryComplete = (score: number) => {
+        const game = GAME_DEFINITIONS.find(g => g.name === 'Family Memory');
+        if (game) {
+            dataService.saveGameResult('p1', score, game.name);
+            loadGameData();
+            setShowFamilyMemory(false);
+        }
+    };
+
+    const handleCloseFamilyMemory = () => {
+        setShowFamilyMemory(false);
+    };
+
+    const handlePatternRecognitionComplete = (score: number) => {
+        const game = GAME_DEFINITIONS.find(g => g.name === 'Pattern Recognition');
+        if (game) {
+            dataService.saveGameResult('p1', score, game.name);
+            loadGameData();
+            setShowPatternRecognition(false);
+        }
+    };
+
+    const handleClosePatternRecognition = () => {
+        setShowPatternRecognition(false);
+    };
+
+    const handleAttentionTrainingComplete = (score: number) => {
+        const game = GAME_DEFINITIONS.find(g => g.name === 'Attention Training');
+        if (game) {
+            dataService.saveGameResult('p1', score, game.name);
+            loadGameData();
+            setShowAttentionTraining(false);
+        }
+    };
+
+    const handleCloseAttentionTraining = () => {
+        setShowAttentionTraining(false);
+    };
+
+    const handleSpeedMemoryComplete = (score: number) => {
+        const game = GAME_DEFINITIONS.find(g => g.name === 'Speed Memory');
+        if (game) {
+            dataService.saveGameResult('p1', score, game.name);
+            loadGameData();
+            setShowSpeedMemory(false);
+        }
+    };
+
+    const handleCloseSpeedMemory = () => {
+        setShowSpeedMemory(false);
+    };
+
+    const handleLogicPuzzleComplete = (score: number) => {
+        const game = GAME_DEFINITIONS.find(g => g.name === 'Logic Puzzles');
+        if (game) {
+            dataService.saveGameResult('p1', score, game.name);
+            loadGameData();
+            setShowLogicPuzzle(false);
+        }
+    };
+
+    const handleCloseLogicPuzzle = () => {
+        setShowLogicPuzzle(false);
     };
 
     const categories = [
@@ -182,7 +289,6 @@ const Games: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Category Filter */}
                 <div className="category-filter">
                     {categories.map(category => (
                         <button
@@ -196,7 +302,6 @@ const Games: React.FC = () => {
                     ))}
                 </div>
 
-                {/* Games Grid */}
                 <div className="games-grid">
                     {filteredGames.map((game) => (
                         <div
@@ -266,6 +371,48 @@ const Games: React.FC = () => {
                         <h3>No games found</h3>
                         <p>Try selecting a different category</p>
                     </div>
+                )}
+
+                {showMemoryGame && (
+                    <MemoryGame
+                        onClose={handleCloseMemoryGame}
+                        onGameComplete={handleMemoryGameComplete}
+                    />
+                )}
+
+                {showFamilyMemory && (
+                    <FamilyMemory
+                        onClose={handleCloseFamilyMemory}
+                        onGameComplete={handleFamilyMemoryComplete}
+                    />
+                )}
+
+                {showPatternRecognition && (
+                    <PatternRecognition
+                        onClose={handleClosePatternRecognition}
+                        onGameComplete={handlePatternRecognitionComplete}
+                    />
+                )}
+
+                {showAttentionTraining && (
+                    <AttentionTraining
+                        onClose={handleCloseAttentionTraining}
+                        onGameComplete={handleAttentionTrainingComplete}
+                    />
+                )}
+
+                {showSpeedMemory && (
+                    <SpeedMemory
+                        onClose={handleCloseSpeedMemory}
+                        onGameComplete={handleSpeedMemoryComplete}
+                    />
+                )}
+
+                {showLogicPuzzle && (
+                    <LogicPuzzle
+                        onClose={handleCloseLogicPuzzle}
+                        onGameComplete={handleLogicPuzzleComplete}
+                    />
                 )}
             </div>
         </div>
