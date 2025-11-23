@@ -171,15 +171,15 @@ const GeofenceManager: React.FC<GeofenceManagerProps> = ({
                             <input
                                 id="geofence-radius"
                                 type="range"
-                                min="100"
+                                min="1"
                                 max="5000"
-                                step="50"
+                                step="1"
                                 value={radius}
                                 onChange={(e) => setRadius(Number(e.target.value))}
                                 disabled={isSaving}
                             />
                             <div className="radius-labels">
-                                <span>100m</span>
+                                <span>1m</span>
                                 <span>2.5km</span>
                                 <span>5km</span>
                             </div>

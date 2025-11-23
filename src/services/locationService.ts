@@ -121,7 +121,7 @@ export async function startLocationTracking(
             },
             {
                 enableHighAccuracy: true,
-                maximumAge: 30000, // 30 seconds
+                maximumAge: 0, // Force fresh location
                 timeout: 27000,
             }
         );
