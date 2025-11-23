@@ -1,4 +1,4 @@
-// No imports needed as we're using type-only exports
+import type { Geofence, LocationPoint } from './geofence';
 
 export type UserRole = 'patient' | 'caregiver' | 'expert' | 'admin';
 
@@ -25,6 +25,9 @@ export interface PatientUser extends BaseUser {
   mood: string;
   lastVisit?: Date;
   status?: 'active' | 'inactive' | 'needs-attention';
+  geofence?: Geofence;
+  lastKnownLocation?: LocationPoint;
+  locationUpdatedAt?: Date;
 }
 
 export interface CaregiverUser extends BaseUser {

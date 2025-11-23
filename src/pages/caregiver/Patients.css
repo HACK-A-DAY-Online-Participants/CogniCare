@@ -308,4 +308,20 @@
         transform: translateY(0);
         opacity: 1;
     }
+}.geofence-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: var(--spacing-sm);
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.geofence-badge svg {
+    flex-shrink: 0;
 }

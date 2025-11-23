@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -16,8 +16,10 @@ import {
     Menu,
     X,
     Sparkles,
-    Mic
+    Mic,
+    Bell
 } from 'lucide-react';
+import { subscribeToNotifications, getUnreadCount, markNotificationAsRead, type Notification } from '../../services/notificationService';
 import './Navigation.css';
 
 interface NavigationProps {
@@ -26,9 +28,23 @@ interface NavigationProps {
 
 const Navigation: React.FC<NavigationProps> = ({ userRole }) => {
     const [isOpen, setIsOpen] = React.useState(false);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [showNotifications, setShowNotifications] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     const { logout, currentUser } = useAuth();
+
+    useEffect(() => {
+        if (!currentUser || userRole !== 'caregiver') return;
+
+        const unsubscribe = subscribeToNotifications(currentUser.id, (newNotifications) => {
+            setNotifications(newNotifications);
+            setUnreadCount(newNotifications.filter(n => !n.isRead).length);
+        });
+
+        return () => unsubscribe();
+    }, [currentUser, userRole]);
 
     const handleLogout = async () => {
         try {
@@ -36,6 +52,16 @@ const Navigation: React.FC<NavigationProps> = ({ userRole }) => {
             navigate('/login');
         } catch (error) {
             console.error('Failed to logout:', error);
+        }
+    };
+
+    const handleNotificationClick = async (notification: Notification) => {
+        if (!notification.isRead) {
+            await markNotificationAsRead(notification.id, notification.type);
+        }
+        setShowNotifications(false);
+        if (notification.link) {
+            navigate(notification.link);
         }
     };
 
@@ -85,9 +111,62 @@ const Navigation: React.FC<NavigationProps> = ({ userRole }) => {
                         <span>CogniCare</span>
                     </Link>
 
-                    <button className="nav-toggle" onClick={() => setIsOpen(!isOpen)}>
-                        {isOpen ? <X size={24} /> : <Menu size={24} />}
-                    </button>
+                    <div className="nav-actions">
+                        {userRole === 'caregiver' && (
+                            <div className="notification-wrapper">
+                                <button
+                                    className="nav-icon-btn"
+                                    onClick={() => setShowNotifications(!showNotifications)}
+                                >
+                                    <Bell size={24} />
+                                    {unreadCount > 0 && (
+                                        <span className="notification-badge">{unreadCount}</span>
+                                    )}
+                                </button>
+
+                                {showNotifications && (
+                                    <div className="notifications-dropdown">
+                                        <div className="notifications-header">
+                                            <h3>Notifications</h3>
+                                            <button onClick={() => setShowNotifications(false)}>
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="notifications-list">
+                                            {notifications.length > 0 ? (
+                                                notifications.map(notification => (
+                                                    <div
+                                                        key={notification.id}
+                                                        className={`notification-item ${!notification.isRead ? 'unread' : ''}`}
+                                                        onClick={() => handleNotificationClick(notification)}
+                                                    >
+                                                        <div className="notification-icon alert">
+                                                            <Bell size={16} />
+                                                        </div>
+                                                        <div className="notification-content">
+                                                            <h4>{notification.title}</h4>
+                                                            <p>{notification.message}</p>
+                                                            <span className="notification-time">
+                                                                {notification.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="empty-notifications">
+                                                    <p>No new notifications</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        <button className="nav-toggle" onClick={() => setIsOpen(!isOpen)}>
+                            {isOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
+                    </div>
 
                     <div className={`nav-menu ${isOpen ? 'active' : ''}`}>
                         <div className="nav-links">

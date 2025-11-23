@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navigation from '../../components/common/Navigation';
-import { Search, Plus, MoreVertical, Phone, Mail, Calendar, Activity, X, Link, UserPlus, Loader2 } from 'lucide-react';
+import GeofenceManager from '../../components/caregiver/GeofenceManager';
+import { Search, Plus, MoreVertical, Phone, Mail, Calendar, Activity, X, Link, UserPlus, Loader2, MapPin, Shield } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { isCaregiverUser } from '../../types/user';
 import type { PatientUser } from '../../types/user';
@@ -15,6 +16,8 @@ const Patients: React.FC = () => {
     const [showConnectModal, setShowConnectModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [connectionMethod, setConnectionMethod] = useState<'code' | 'add'>('code');
+    const [showGeofenceModal, setShowGeofenceModal] = useState(false);
+    const [selectedPatient, setSelectedPatient] = useState<PatientUser | null>(null);
 
     // Connection Form State (for existing patients)
     const [patientCode, setPatientCode] = useState('');
@@ -139,6 +142,15 @@ const Patients: React.FC = () => {
         patient.condition.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const handleSetSafeZone = (patient: PatientUser) => {
+        setSelectedPatient(patient);
+        setShowGeofenceModal(true);
+    };
+
+    const handleGeofenceSaved = () => {
+        loadPatients(); // Reload to get updated geofence data
+    };
+
     return (
         <div className="page-wrapper">
             <Navigation userRole="caregiver" />
@@ -205,10 +217,21 @@ const Patients: React.FC = () => {
                                     <button className="action-btn">
                                         <Mail size={18} />
                                     </button>
-                                    <button className="btn btn-outline btn-sm" style={{ flex: 1 }}>
-                                        View Profile
+                                    <button
+                                        className="btn btn-outline btn-sm"
+                                        onClick={() => handleSetSafeZone(patient)}
+                                        style={{ flex: 1 }}
+                                    >
+                                        <MapPin size={16} />
+                                        {patient.geofence ? 'Edit' : 'Set'} Safe Zone
                                     </button>
                                 </div>
+                                {patient.geofence && patient.geofence.isActive && (
+                                    <div className="geofence-badge">
+                                        <Shield size={14} />
+                                        Safe zone active
+                                    </div>
+                                )}
                             </div>
                         ))
                     ) : (
@@ -423,6 +446,21 @@ const Patients: React.FC = () => {
                             )}
                         </div>
                     </div>
+                )}
+
+                {/* Geofence Manager Modal */}
+                {showGeofenceModal && selectedPatient && currentUser && isCaregiverUser(currentUser) && (
+                    <GeofenceManager
+                        patientId={selectedPatient.id}
+                        patientName={selectedPatient.name}
+                        caregiverId={currentUser.id}
+                        existingGeofence={selectedPatient.geofence}
+                        onClose={() => {
+                            setShowGeofenceModal(false);
+                            setSelectedPatient(null);
+                        }}
+                        onSave={handleGeofenceSaved}
+                    />
                 )}
             </div>
         </div>

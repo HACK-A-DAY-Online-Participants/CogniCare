@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navigation from '../../components/common/Navigation';
 import Chatbot from '../../components/common/Chatbot';
 import VoiceAgent from '../../components/common/VoiceAgent';
+import LocationTracker from '../../components/patient/LocationTracker';
 import { Brain, Trophy, Play, CheckCircle, UserPlus, X, Check } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { isPatientUser } from '../../types/user';
@@ -168,28 +169,32 @@ const Dashboard: React.FC = () => {
                     <VoiceAgent showStatus={false} />
                 </header>
 
+                <LocationTracker />
+
                 {/* Connection Request Alert */}
-                {pendingRequests.length > 0 && (
-                    <div className="connection-alert card">
-                        <div className="alert-header">
-                            <UserPlus size={24} className="text-primary" />
-                            <h3>New Connection Request</h3>
-                        </div>
-                        {pendingRequests.map(req => (
-                            <div key={req.id} className="request-item">
-                                <p><strong>{req.caregiverName}</strong> wants to connect with you.</p>
-                                <div className="request-actions">
-                                    <button className="btn-reject" onClick={() => handleRequest(req.id, false)}>
-                                        <X size={18} /> Reject
-                                    </button>
-                                    <button className="btn-accept" onClick={() => handleRequest(req.id, true)}>
-                                        <Check size={18} /> Approve
-                                    </button>
-                                </div>
+                {
+                    pendingRequests.length > 0 && (
+                        <div className="connection-alert card">
+                            <div className="alert-header">
+                                <UserPlus size={24} className="text-primary" />
+                                <h3>New Connection Request</h3>
                             </div>
-                        ))}
-                    </div>
-                )}
+                            {pendingRequests.map(req => (
+                                <div key={req.id} className="request-item">
+                                    <p><strong>{req.caregiverName}</strong> wants to connect with you.</p>
+                                    <div className="request-actions">
+                                        <button className="btn-reject" onClick={() => handleRequest(req.id, false)}>
+                                            <X size={18} /> Reject
+                                        </button>
+                                        <button className="btn-accept" onClick={() => handleRequest(req.id, true)}>
+                                            <Check size={18} /> Approve
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )
+                }
 
                 {/* Stats Overview */}
                 <div className="stats-grid">
@@ -307,9 +312,9 @@ const Dashboard: React.FC = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
             <Chatbot />
-        </div>
+        </div >
     );
 };
 
