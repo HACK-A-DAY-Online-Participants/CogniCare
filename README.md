@@ -17,6 +17,7 @@
 ---
 
 ## 📋 Overview
+https://cognicaree.vercel.app/ 
 
 **CogniCare** is a comprehensive cognitive health management platform designed for patients with dementia, Alzheimer's, and other cognitive conditions. It combines **AI-powered behavior analysis**, **real-time monitoring**, **gamified brain training**, and **collaborative care** to provide a holistic solution for cognitive health management.
 
